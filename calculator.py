@@ -1,8 +1,10 @@
-# print(int(input("Enter x "))+int(input("Enter y ")))
-x = float(input("Enter x "))
-y = float(input("Enter y "))
+def main():
+    x = int(input("What's x? "))
+    print("x squared is", square(x))
 
-z = round(x + y , 5)
+def square(x):
+    x = pow(x, 2)
+    return x
 
-print(f"{z:,.2f}")
-
+if __name__ == "__main__":
+    main()
