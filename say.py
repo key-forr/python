@@ -1,4 +1,5 @@
 import cowsay
 import sys
 
-print("g")
+if len(sys.argv) == 2:
+    cowsay.cow("Hello " + sys.argv[1])
