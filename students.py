@@ -1,10 +1,12 @@
+import csv
+
 students = []
 
 
 with open("students.csv") as file:
-    for line in file:
-        name, house, phone = line.rstrip().split(",")
-        students.append({"name": name, "house": house, "phone": phone})
+    reader = csv.reader(file)
+    for name, home, phone in reader:
+        students.append({"name": name, "house": home, "phone": phone})
 
 
 def get_name(student):
