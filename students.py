@@ -6,5 +6,5 @@ phone = input("What's your phone number? ")
 
 
 with open("students.csv", "a") as file:
-    write = csv.writer(file)
-    write.writerow([name, home, phone])
+    write = csv.DictWriter(file, fieldnames=["name", "home", "phone"])
+    write.writerow({ "name": name, "home": home, "phone": phone})
