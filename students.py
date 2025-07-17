@@ -4,9 +4,9 @@ students = []
 
 
 with open("students.csv") as file:
-    reader = csv.reader(file)
-    for name, home, phone in reader:
-        students.append({"name": name, "house": home, "phone": phone})
+    reader = csv.DictReader(file)
+    for row in reader:
+        students.append({"name": row["name"], "house": row["house"], "phone": row["phone"]})
 
 
 def get_name(student):
