@@ -1,23 +1,15 @@
+import re
+
 email = input("What's your enail address? ").strip()
 
 def validate_email(email):
-    if "@" not in email or email.count("@") != 1:
-        return "Invalid"
-    
-    name, domain = email.split("@")
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 
-    if not name:
-        return "Invalid"
-    
-    if "." not in domain:
-        return "Invalid"
-    
-    parts = domain.rsplit(".", 1)
-    if len(parts) != 2 or not parts[0] or not parts[1]:
-        return "Invalid"
-    
+    if re.fullmatch(pattern, email):  
+        return "Valid"
+    return "Invalid"
 
-    return "Valid"
+
 
 result = validate_email(email)
 print(result)
