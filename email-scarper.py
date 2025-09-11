@@ -39,11 +39,12 @@ try:
         for anchor in soup.find_all("a"):
             link = anchor.attrs['href'] if 'href' in anchor.attrs else ''
             if link.startswith('/'):
-                link = base_url + link
+                link = base_url + link 
             elif not link.startswith('http'):
-                link = path + link
+                link = path + link 
             if not link in urls and not link in scraped_urls:
                 urls.append(link)
+
 
 except KeyboardInterrupt:
     print('[-] Closing!')
