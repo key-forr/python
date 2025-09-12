@@ -1,16 +1,7 @@
-import os
-from multiprocessing import cpu_count
+import hashlib
 
+test_password = 'my_passwd'
+test_hash_obj = hashlib.sha224(test_password.encode('utf-8'))
+digest = test_hash_obj.hexdigest()
 
-def n_cpu():
-    c = os.cpu_count()
-    return c or cpu_count()
-
-
-def main():
-    cores = n_cpu()
-    print(f"Detected CPU cores: {cores}")
-
-
-if __name__ == '__main__':
-    main()
+print(digest) # 4b18bf88fab81f30a3bcf3de9397ab4aff16545694dc733ab6630efd
