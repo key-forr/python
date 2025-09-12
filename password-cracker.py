@@ -25,11 +25,6 @@ def blake2b_hex(s: str) -> str:
 
 
 def idx_to_candidate(idx: int, length: int, charset: str) -> str:
-    """Convert an integer index to a candidate string in base len(charset).
-
-    Index 0 -> charset[0]*length (i.e. first lexicographic string), etc.
-    The ordering is lexicographic where the leftmost character changes slowest.
-    """
     base = len(charset)
     chars = []
     for _ in range(length):
@@ -39,10 +34,6 @@ def idx_to_candidate(idx: int, length: int, charset: str) -> str:
 
 
 def sequential_search(length: int, charset: str, target_hash_hex: str, max_checks: int = None):
-    """Sequential brute-force search. If max_checks is None, tries the whole space.
-
-    Returns: (found_password_or_None, checks_done, elapsed_seconds)
-    """
     total = len(charset) ** length
     if max_checks is None:
         max_checks = total
@@ -86,7 +77,6 @@ def multiprocessing_search(length: int, charset: str, target_hash_hex: str, npro
     procs = []
     start_time = time.perf_counter()
 
-    # start processes
     for i in range(nprocs):
         p = Process(target=worker_process, args=(i, i, nprocs, length, charset, target_hash_hex, stop_event, out_q))
         p.start()
