@@ -13,7 +13,7 @@ def scan_port(ipaddress, port):
         print("[+] Port is Opened " + str(port))
         sock.close()
     except:
-        print("[-] Port is Closed" + str(port))
+        pass
 
 
 targets = input("[*] Enter Targets to Scan(split them by ,): ")
