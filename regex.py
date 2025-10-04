@@ -67,7 +67,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("ЗАВДАННЯ 2: Слова з більше 5 приголосних")
     print("=" * 70)
-    text2 = "Programming strengths transcripts complexity"
+    text2 = "Programming operation transcripts complexity rhythm onslaught"
     result2 = find_words_with_many_consonants(text2)
     print(f"Текст: {text2}")
     print(f"Результат: {result2}\n")
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("ЗАВДАННЯ 3: Слова, що починаються на голосну")
     print("=" * 70)
-    text3 = "An apple and an orange are excellent fruits"
+    text3 = "An apple and an orange are excellent fruits for a healthy diet"
     result3 = find_words_starting_with_vowel(text3)
     print(f"Текст: {text3}")
     print(f"Результат: {result3}\n")
