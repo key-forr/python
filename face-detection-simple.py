@@ -1,6 +1,6 @@
 import cv2
 
-image_path = "/home/rotory-ken/Pictures/ddayeena&key.forr1/5460845957185930789.jpg"  
+image_path = "images/simple-2.jpg"  
 
 image = cv2.imread(image_path)
 
