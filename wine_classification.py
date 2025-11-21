@@ -13,7 +13,7 @@ X = wine.data
 y = wine.target
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.5, random_state=42, stratify=y
+    X, y, test_size=0.8, random_state=42, stratify=y
 )
 
 scaler = StandardScaler()
@@ -59,8 +59,8 @@ print(f"\nКращий метод за точністю: {best_method}")
 print(f"\nКількість помилок Random Forest: {len(rf_error_indices)}")
 print(f"Кількість помилок SVM: {len(svm_error_indices)}")
 
-fig = plt.figure(figsize=(18, 12))
-gs = fig.add_gridspec(3, 3, hspace=0.35, wspace=0.3)
+fig = plt.figure(figsize=(18, 14))
+gs = fig.add_gridspec(4, 3, hspace=0.35, wspace=0.3)
 
 fig.suptitle('Порівняння моделей класифікації вин з аналізом помилок', fontsize=16, fontweight='bold')
 
@@ -130,96 +130,99 @@ ax5.set_xticklabels(metric_names, fontsize=9)
 ax5.legend()
 ax5.grid(axis='y', alpha=0.3, linestyle='--')
 
-# НОВА ДІАГРАМА: Аналіз помилок
-ax6 = fig.add_subplot(gs[2, :])
+# Scatter plots для Random Forest
+ax6 = fig.add_subplot(gs[2, 0])
+# Використовуємо перші дві найважливіші ознаки (alcohol та flavanoids)
+feature_idx = [0, 6]  # alcohol (0) та flavanoids (6)
+colors_map = ['#FF6B6B', '#4ECDC4', '#FFD93D']
+for i, class_name in enumerate(wine.target_names):
+    mask = y_test == i
+    ax6.scatter(X_test_scaled[mask, feature_idx[0]], 
+                X_test_scaled[mask, feature_idx[1]], 
+                c=colors_map[i], label=class_name, alpha=0.6, s=50, edgecolors='black')
+# Помилки RF
+if len(rf_error_indices) > 0:
+    ax6.scatter(X_test_scaled[rf_error_indices, feature_idx[0]], 
+                X_test_scaled[rf_error_indices, feature_idx[1]], 
+                marker='x', s=200, c='red', linewidths=3, label='Помилки RF')
+ax6.set_xlabel(f'{wine.feature_names[feature_idx[0]]}', fontweight='bold')
+ax6.set_ylabel(f'{wine.feature_names[feature_idx[1]]}', fontweight='bold')
+ax6.set_title('Random Forest - Розподіл класів та помилки')
+ax6.legend()
+ax6.grid(True, alpha=0.3)
 
-# Підготовка даних для візуалізації помилок
-error_data = []
-for idx in rf_error_indices:
-    error_data.append({
-        'index': idx,
-        'model': 'Random Forest',
-        'true': wine.target_names[y_test[idx]],
-        'predicted': wine.target_names[y_pred_rf[idx]]
-    })
+# Scatter plots для SVM
+ax7 = fig.add_subplot(gs[2, 1])
+for i, class_name in enumerate(wine.target_names):
+    mask = y_test == i
+    ax7.scatter(X_test_scaled[mask, feature_idx[0]], 
+                X_test_scaled[mask, feature_idx[1]], 
+                c=colors_map[i], label=class_name, alpha=0.6, s=50, edgecolors='black')
+# Помилки SVM
+if len(svm_error_indices) > 0:
+    ax7.scatter(X_test_scaled[svm_error_indices, feature_idx[0]], 
+                X_test_scaled[svm_error_indices, feature_idx[1]], 
+                marker='x', s=200, c='red', linewidths=3, label='Помилки SVM')
+ax7.set_xlabel(f'{wine.feature_names[feature_idx[0]]}', fontweight='bold')
+ax7.set_ylabel(f'{wine.feature_names[feature_idx[1]]}', fontweight='bold')
+ax7.set_title('SVM - Розподіл класів та помилки')
+ax7.legend()
+ax7.grid(True, alpha=0.3)
 
-for idx in svm_error_indices:
-    error_data.append({
-        'index': idx,
-        'model': 'SVM',
-        'true': wine.target_names[y_test[idx]],
-        'predicted': wine.target_names[y_pred_svm[idx]]
-    })
+# Scatter plot порівняння помилок
+ax8 = fig.add_subplot(gs[2, 2])
+for i, class_name in enumerate(wine.target_names):
+    mask = y_test == i
+    ax8.scatter(X_test_scaled[mask, feature_idx[0]], 
+                X_test_scaled[mask, feature_idx[1]], 
+                c=colors_map[i], label=class_name, alpha=0.4, s=50, edgecolors='black')
+# Унікальні помилки RF
+rf_only_errors = np.setdiff1d(rf_error_indices, svm_error_indices)
+if len(rf_only_errors) > 0:
+    ax8.scatter(X_test_scaled[rf_only_errors, feature_idx[0]], 
+                X_test_scaled[rf_only_errors, feature_idx[1]], 
+                marker='s', s=150, c='blue', linewidths=2, label='Помилки тільки RF', edgecolors='black')
+# Унікальні помилки SVM
+svm_only_errors = np.setdiff1d(svm_error_indices, rf_error_indices)
+if len(svm_only_errors) > 0:
+    ax8.scatter(X_test_scaled[svm_only_errors, feature_idx[0]], 
+                X_test_scaled[svm_only_errors, feature_idx[1]], 
+                marker='^', s=150, c='green', linewidths=2, label='Помилки тільки SVM', edgecolors='black')
+# Спільні помилки
+common_errors = np.intersect1d(rf_error_indices, svm_error_indices)
+if len(common_errors) > 0:
+    ax8.scatter(X_test_scaled[common_errors, feature_idx[0]], 
+                X_test_scaled[common_errors, feature_idx[1]], 
+                marker='X', s=200, c='red', linewidths=3, label='Спільні помилки', edgecolors='black')
+ax8.set_xlabel(f'{wine.feature_names[feature_idx[0]]}', fontweight='bold')
+ax8.set_ylabel(f'{wine.feature_names[feature_idx[1]]}', fontweight='bold')
+ax8.set_title('Порівняння помилок обох моделей')
+ax8.legend(fontsize=8)
+ax8.grid(True, alpha=0.3)
 
-if error_data:
-    # Підрахунок типів помилок
-    from collections import Counter
-    
-    rf_error_types = Counter([f"{wine.target_names[y_test[i]]} → {wine.target_names[y_pred_rf[i]]}" 
-                               for i in rf_error_indices])
-    svm_error_types = Counter([f"{wine.target_names[y_test[i]]} → {wine.target_names[y_pred_svm[i]]}" 
-                                for i in svm_error_indices])
-    
-    # Об'єднуємо всі типи помилок
-    all_error_types = set(list(rf_error_types.keys()) + list(svm_error_types.keys()))
-    
-    if all_error_types:
-        error_types_list = sorted(list(all_error_types))
-        rf_counts = [rf_error_types.get(et, 0) for et in error_types_list]
-        svm_counts = [svm_error_types.get(et, 0) for et in error_types_list]
-        
-        x = np.arange(len(error_types_list))
-        width = 0.35
-        
-        bars1 = ax6.bar(x - width/2, rf_counts, width, label='Random Forest',
-                        color='#2E86AB', alpha=0.7, edgecolor='black')
-        bars2 = ax6.bar(x + width/2, svm_counts, width, label='SVM',
-                        color='#06A77D', alpha=0.7, edgecolor='black')
-        
-        ax6.set_xlabel('Тип помилки (Справжній → Передбачений)', fontweight='bold')
-        ax6.set_ylabel('Кількість помилок', fontweight='bold')
-        ax6.set_title('Аналіз помилок: Де саме моделі помилилися', fontsize=12, fontweight='bold')
-        ax6.set_xticks(x)
-        ax6.set_xticklabels(error_types_list, rotation=45, ha='right')
-        ax6.legend()
-        ax6.grid(axis='y', alpha=0.3, linestyle='--')
-        
-        # Додаємо значення на стовпці
-        for bars in [bars1, bars2]:
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax6.text(bar.get_x() + bar.get_width()/2., height,
-                            f'{int(height)}', ha='center', va='bottom', fontsize=9)
-    else:
-        ax6.text(0.5, 0.5, 'Помилок не виявлено!', 
-                ha='center', va='center', fontsize=14, fontweight='bold',
-                transform=ax6.transAxes)
-        ax6.set_xticks([])
-        ax6.set_yticks([])
-else:
-    ax6.text(0.5, 0.5, 'Обидві моделі класифікували всі зразки правильно!', 
-            ha='center', va='center', fontsize=14, fontweight='bold',
-            transform=ax6.transAxes)
-    ax6.set_xticks([])
-    ax6.set_yticks([])
+# Додатковий scatter plot з іншими ознаками
+ax9 = fig.add_subplot(gs[3, :])
+feature_idx2 = [9, 12]  # color_intensity та proline
+for i, class_name in enumerate(wine.target_names):
+    mask = y_test == i
+    ax9.scatter(X_test_scaled[mask, feature_idx2[0]], 
+                X_test_scaled[mask, feature_idx2[1]], 
+                c=colors_map[i], label=class_name, alpha=0.6, s=60, edgecolors='black')
+# Помилки обох моделей
+if len(rf_error_indices) > 0:
+    ax9.scatter(X_test_scaled[rf_error_indices, feature_idx2[0]], 
+                X_test_scaled[rf_error_indices, feature_idx2[1]], 
+                marker='o', s=250, facecolors='none', edgecolors='blue', 
+                linewidths=2.5, label='Помилки RF')
+if len(svm_error_indices) > 0:
+    ax9.scatter(X_test_scaled[svm_error_indices, feature_idx2[0]], 
+                X_test_scaled[svm_error_indices, feature_idx2[1]], 
+                marker='s', s=250, facecolors='none', edgecolors='green', 
+                linewidths=2.5, label='Помилки SVM')
+ax9.set_xlabel(f'{wine.feature_names[feature_idx2[0]]}', fontweight='bold')
+ax9.set_ylabel(f'{wine.feature_names[feature_idx2[1]]}', fontweight='bold')
+ax9.set_title('Альтернативний простір ознак - Розподіл класів та помилки')
+ax9.legend(loc='best', ncol=3)
+ax9.grid(True, alpha=0.3)
 
 plt.show()
-
-# Детальний звіт про помилки
-if len(rf_error_indices) > 0 or len(svm_error_indices) > 0:
-    print("\n" + "=" * 60)
-    print("ДЕТАЛЬНИЙ АНАЛІЗ ПОМИЛОК")
-    print("=" * 60)
-    
-    if len(rf_error_indices) > 0:
-        print("\nПомилки Random Forest:")
-        for idx in rf_error_indices:
-            print(f"  Зразок {idx}: Справжній клас = {wine.target_names[y_test[idx]]}, "
-                  f"Передбачений = {wine.target_names[y_pred_rf[idx]]}")
-    
-    if len(svm_error_indices) > 0:
-        print("\nПомилки SVM:")
-        for idx in svm_error_indices:
-            print(f"  Зразок {idx}: Справжній клас = {wine.target_names[y_test[idx]]}, "
-                  f"Передбачений = {wine.target_names[y_pred_svm[idx]]}")
